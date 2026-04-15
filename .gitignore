@@ -1,0 +1,10 @@
+.DS_Store
+
+# Local Shopify CLI data
+.shopify/
+
+# Local AI assistant/project metadata
+.agents/
+.claude/
+CLAUDE.md
+skills-lock.json
