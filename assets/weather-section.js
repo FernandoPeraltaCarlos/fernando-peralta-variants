@@ -22,6 +22,45 @@ function renderMessage(widget, message, state) {
   widget.textContent = message;
 }
 
+function getCurrentPosition() {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error('Geolocation is not supported.'));
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(resolve, reject, {
+      enableHighAccuracy: false,
+      timeout: 8000,
+      maximumAge: 600000,
+    });
+  });
+}
+
+async function resolveLocationQuery(widget) {
+  const configuredCity = widget.dataset.city?.trim();
+  const fallbackCity = configuredCity || 'Denver';
+  const useVisitorLocation = widget.dataset.useVisitorLocation === 'true';
+
+  if (!useVisitorLocation) {
+    return fallbackCity;
+  }
+
+  try {
+    const position = await getCurrentPosition();
+    const latitude = position.coords.latitude?.toFixed(4);
+    const longitude = position.coords.longitude?.toFixed(4);
+
+    if (latitude && longitude) {
+      return `${latitude},${longitude}`;
+    }
+  } catch (error) {
+    console.warn('Weather section could not detect the visitor location.', error);
+  }
+
+  return fallbackCity;
+}
+
 function renderWeather(widget, data) {
   widget.classList.remove('weather-section__widget--loading', 'weather-section__widget--error');
   widget.replaceChildren();
@@ -76,13 +115,7 @@ async function loadWeather(widget) {
 
   widget.dataset.weatherInitialized = 'true';
 
-  const city = widget.dataset.city?.trim();
   const endpoint = widget.dataset.weatherEndpoint?.trim();
-
-  if (!city) {
-    renderMessage(widget, 'Add a city in the section settings.');
-    return;
-  }
 
   if (!endpoint) {
     renderMessage(widget, 'Weather endpoint is not configured.', 'error');
@@ -92,7 +125,8 @@ async function loadWeather(widget) {
   renderMessage(widget, 'Loading weather...', 'loading');
 
   try {
-    const response = await fetch(`${endpoint}?city=${encodeURIComponent(city)}`, {
+    const locationQuery = await resolveLocationQuery(widget);
+    const response = await fetch(`${endpoint}?city=${encodeURIComponent(locationQuery)}`, {
       headers: {
         Accept: 'application/json',
       },

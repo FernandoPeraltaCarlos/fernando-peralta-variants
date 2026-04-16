@@ -24,6 +24,7 @@
       class="weather-section__widget"
       data-city="{{ section.settings.city | escape }}"
       data-weather-endpoint="https://shopify-app-wheather.vercel.app/api/weather"
+      data-use-visitor-location="{{ section.settings.use_visitor_location }}"
       data-weather-widget
       aria-live="polite"
     >
@@ -50,10 +51,18 @@
       "default": "Current Weather"
     },
     {
+      "type": "checkbox",
+      "id": "use_visitor_location",
+      "label": "Use visitor location",
+      "default": true,
+      "info": "When enabled, the section will try to detect the visitor's location automatically."
+    },
+    {
       "type": "text",
       "id": "city",
       "label": "City",
-      "default": "New York"
+      "info": "Used when visitor location is disabled or unavailable.",
+      "default": "Denver"
     },
     {
       "type": "select",
