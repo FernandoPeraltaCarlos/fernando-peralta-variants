@@ -6,5 +6,6 @@
 # Local AI assistant/project metadata
 .agents/
 .claude/
+AGENTS.md
 CLAUDE.md
 skills-lock.json
