@@ -33,8 +33,24 @@
       <h2 class="weather-section__title">{{ section.settings.title | escape }}</h2>
     {%- endif -%}
 
-    <div class="weather-section__widget" aria-live="polite">
-      Loading weather...
+    <div class="weather-section__widget" data-state="loading" aria-live="polite">
+      <p class="weather-section__status" data-weather-status>Loading weather...</p>
+
+      <div class="weather-section__content" hidden>
+        <p class="weather-section__location" data-weather-location></p>
+        <div class="weather-section__summary">
+          <img class="weather-section__icon" data-weather-icon width="64" height="64" loading="lazy" alt="" hidden>
+          <div class="weather-section__summary-text">
+            <div class="weather-section__temperature">
+              <p class="weather-section__temp-primary" data-weather-temp-f></p>
+              <p class="weather-section__temp-secondary" data-weather-temp-c></p>
+            </div>
+            <p class="weather-section__condition" data-weather-condition></p>
+          </div>
+        </div>
+        <p class="weather-section__meta" data-weather-meta></p>
+        <p class="weather-section__updated" data-weather-updated hidden></p>
+      </div>
     </div>
   </div>
 </div>

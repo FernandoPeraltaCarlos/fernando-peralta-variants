@@ -1,31 +1,27 @@
-function createElement(tagName, className, text) {
-  const element = document.createElement(tagName);
+function setState(root, state, statusMessage = '') {
+  const widget = root.querySelector('.weather-section__widget');
 
-  if (className) {
-    element.className = className;
+  if (!widget) {
+    return;
   }
 
-  if (text !== undefined) {
-    element.textContent = text;
-  }
+  const status = widget.querySelector('[data-weather-status]');
+  const content = widget.querySelector('.weather-section__content');
 
-  return element;
-}
+  widget.dataset.state = state;
 
-function getContent(root) {
-  return root.querySelector('.weather-section__widget') || root;
-}
-
-function renderMessage(root, message, state) {
-  const content = getContent(root);
-  content.classList.remove('weather-section__widget--loading', 'weather-section__widget--error');
-
-  if (state) {
-    content.classList.add(`weather-section__widget--${state}`);
+  if (state !== 'ready') {
     root.dataset.weather = state;
   }
 
-  content.textContent = message;
+  if (status) {
+    status.textContent = statusMessage;
+    status.hidden = state === 'ready';
+  }
+
+  if (content) {
+    content.hidden = state !== 'ready';
+  }
 }
 
 function getCurrentPosition() {
@@ -81,54 +77,60 @@ function resolveWeatherMood(condition, isDay) {
 }
 
 function renderWeather(root, data) {
-  const widget = getContent(root);
-  widget.classList.remove('weather-section__widget--loading', 'weather-section__widget--error');
-  widget.replaceChildren();
-
   const isDay = data.is_day === undefined ? true : Boolean(data.is_day);
   root.dataset.weather = resolveWeatherMood(data.condition, isDay);
 
-  const content = createElement('div', 'weather-section__content');
-  const locationParts = [data.city, data.region, data.country].filter(Boolean);
-  content.append(createElement('p', 'weather-section__location', locationParts.join(', ')));
+  const setText = (selector, value) => {
+    const element = root.querySelector(selector);
 
-  const summary = createElement('div', 'weather-section__summary');
+    if (element) {
+      element.textContent = value;
+    }
+  };
 
-  if (data.condition_icon) {
-    const icon = document.createElement('img');
-    icon.className = 'weather-section__icon';
-    icon.src = data.condition_icon;
-    icon.alt = data.condition || 'Weather icon';
-    icon.width = 64;
-    icon.height = 64;
-    icon.loading = 'lazy';
-    summary.append(icon);
-  }
-
-  const summaryText = createElement('div', 'weather-section__summary-text');
-  const temperature = createElement('div', 'weather-section__temperature');
-  temperature.append(createElement('p', 'weather-section__temp-primary', `${data.temp_f}°F`));
-  temperature.append(createElement('p', 'weather-section__temp-secondary', `${data.temp_c}°C`));
-  summaryText.append(temperature);
-  summaryText.append(createElement('p', 'weather-section__condition', data.condition));
-  summary.append(summaryText);
-
-  content.append(summary);
-
-  const metaParts = [
+  setText('[data-weather-location]', [data.city, data.region, data.country].filter(Boolean).join(', '));
+  setText('[data-weather-temp-f]', `${data.temp_f}°F`);
+  setText('[data-weather-temp-c]', `${data.temp_c}°C`);
+  setText('[data-weather-condition]', data.condition || '');
+  setText(
+    '[data-weather-meta]',
+    [
     `Feels like ${data.feels_like_f}°F`,
     `Humidity ${data.humidity}%`,
     `Wind ${data.wind_kph} kph ${data.wind_dir}`,
     `UV ${data.uv}`,
-  ].filter(Boolean);
+    ]
+      .filter(Boolean)
+      .join(' • ')
+  );
 
-  content.append(createElement('p', 'weather-section__meta', metaParts.join(' • ')));
+  const icon = root.querySelector('[data-weather-icon]');
 
-  if (data.last_updated) {
-    content.append(createElement('p', 'weather-section__updated', `Last updated: ${data.last_updated}`));
+  if (icon) {
+    if (data.condition_icon) {
+      icon.src = data.condition_icon;
+      icon.alt = data.condition || 'Weather icon';
+      icon.hidden = false;
+    } else {
+      icon.removeAttribute('src');
+      icon.alt = '';
+      icon.hidden = true;
+    }
   }
 
-  widget.append(content);
+  const updated = root.querySelector('[data-weather-updated]');
+
+  if (updated) {
+    if (data.last_updated) {
+      updated.textContent = `Last updated: ${data.last_updated}`;
+      updated.hidden = false;
+    } else {
+      updated.textContent = '';
+      updated.hidden = true;
+    }
+  }
+
+  setState(root, 'ready');
 }
 
 async function loadWeather(widget) {
@@ -141,11 +143,11 @@ async function loadWeather(widget) {
   const endpoint = widget.dataset.weatherEndpoint?.trim();
 
   if (!endpoint) {
-    renderMessage(widget, 'Weather endpoint is not configured.', 'error');
+    setState(widget, 'error', 'Weather endpoint is not configured.');
     return;
   }
 
-  renderMessage(widget, 'Loading weather...', 'loading');
+  setState(widget, 'loading', 'Loading weather...');
 
   try {
     const locationQuery = await resolveLocationQuery(widget);
@@ -163,7 +165,7 @@ async function loadWeather(widget) {
     renderWeather(widget, weather);
   } catch (error) {
     console.error('Weather section failed to load.', error);
-    renderMessage(widget, 'Weather data is unavailable right now. Please try again later.', 'error');
+    setState(widget, 'error', 'Weather data is unavailable right now. Please try again later.');
   }
 }
 

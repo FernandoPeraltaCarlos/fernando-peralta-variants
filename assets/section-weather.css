@@ -33,9 +33,13 @@
 	min-height: 2.4rem;
 }
 
-.weather-section__widget--loading,
-.weather-section__widget--error {
+.weather-section__widget[data-state='loading'],
+.weather-section__widget[data-state='error'] {
 	color: rgba(255, 255, 255, 0.85);
+}
+
+.weather-section__status {
+	margin: 0;
 }
 
 /* -------------------------------------------------------------------------
@@ -45,6 +49,10 @@
 .weather-section__content {
 	display: grid;
 	gap: 1.6rem;
+}
+
+.weather-section__content[hidden] {
+	display: none;
 }
 
 .weather-section__location {
