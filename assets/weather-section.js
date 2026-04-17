@@ -76,6 +76,33 @@ function resolveWeatherMood(condition, isDay) {
   return isDay ? 'sunny' : 'night';
 }
 
+function formatUpdatedTime(lastUpdated) {
+  if (!lastUpdated) {
+    return null;
+  }
+
+  const match = String(lastUpdated).match(/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2})$/);
+
+  if (!match) {
+    return {
+      dateTime: String(lastUpdated).replace(' ', 'T'),
+      label: String(lastUpdated),
+    };
+  }
+
+  const [, year, month, day, hour, minute] = match;
+  const date = new Date(Number(year), Number(month) - 1, Number(day), Number(hour), Number(minute));
+  const formatter = new Intl.DateTimeFormat(document.documentElement.lang || undefined, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  });
+
+  return {
+    dateTime: `${year}-${month}-${day}T${hour}:${minute}`,
+    label: formatter.format(date),
+  };
+}
+
 function renderWeather(root, data) {
   const isDay = data.is_day === undefined ? true : Boolean(data.is_day);
   root.dataset.weather = resolveWeatherMood(data.condition, isDay);
@@ -122,11 +149,29 @@ function renderWeather(root, data) {
 
   if (updated) {
     if (data.last_updated) {
-      updated.textContent = `Last updated: ${data.last_updated}`;
-      updated.hidden = false;
+      const formattedUpdated = formatUpdatedTime(data.last_updated);
+      const updatedWrapper = updated.closest('.weather-section__updated');
+
+      if (formattedUpdated) {
+        updated.dateTime = formattedUpdated.dateTime;
+        updated.textContent = `Last updated: ${formattedUpdated.label}`;
+      } else {
+        updated.removeAttribute('datetime');
+        updated.textContent = '';
+      }
+
+      if (updatedWrapper) {
+        updatedWrapper.hidden = false;
+      }
     } else {
       updated.textContent = '';
-      updated.hidden = true;
+      updated.removeAttribute('datetime');
+
+      const updatedWrapper = updated.closest('.weather-section__updated');
+
+      if (updatedWrapper) {
+        updatedWrapper.hidden = true;
+      }
     }
   }
 
