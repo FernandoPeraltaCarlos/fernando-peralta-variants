@@ -1,85 +1,403 @@
+/* =========================================================================
+   Weather section
+   Aesthetic: soft, minimal card with a living sky background.
+   All weather atmospheres are pure CSS (gradients + keyframes).
+   ========================================================================= */
+
 .weather-section {
-  border-radius: var(--buttons-radius-outset);
-  padding: 3.2rem;
+	position: relative;
+	isolation: isolate;
+	overflow: hidden;
+	border-radius: 2rem;
+	padding: 3.6rem;
+	color: #f6fbff;
+	box-shadow:
+		0 1px 0 rgba(255, 255, 255, 0.25) inset,
+		0 30px 60px -30px rgba(15, 23, 42, 0.45);
+	transition: background 600ms ease;
+	background: linear-gradient(160deg, #64748b 0%, #334155 100%);
 }
 
 .weather-section__title {
-  margin: 0 0 1.6rem;
+	position: relative;
+	z-index: 3;
+	margin: 0 0 2rem;
+	font-weight: 500;
+	letter-spacing: 0.02em;
+	text-shadow: 0 1px 16px rgba(0, 0, 0, 0.25);
 }
 
 .weather-section__widget {
-  min-height: 2.4rem;
+	position: relative;
+	z-index: 3;
+	min-height: 2.4rem;
 }
 
 .weather-section__widget--loading,
 .weather-section__widget--error {
-  color: rgba(var(--color-foreground), 0.75);
+	color: rgba(255, 255, 255, 0.85);
 }
+
+/* -------------------------------------------------------------------------
+   Content
+   ------------------------------------------------------------------------- */
 
 .weather-section__content {
-  display: grid;
-  gap: 1.6rem;
+	display: grid;
+	gap: 1.6rem;
 }
 
-.weather-section__location,
-.weather-section__condition,
-.weather-section__meta,
-.weather-section__updated {
-  margin: 0;
+.weather-section__location {
+	margin: 0;
+	font-size: 1.4rem;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	opacity: 0.85;
 }
 
 .weather-section__summary {
-  display: flex;
-  align-items: center;
-  gap: 1.6rem;
+	display: flex;
+	align-items: center;
+	gap: 2rem;
 }
 
 .weather-section__icon {
-  width: 6.4rem;
-  height: 6.4rem;
-  flex-shrink: 0;
+	width: 8rem;
+	height: 8rem;
+	flex-shrink: 0;
+	filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.25));
+}
+
+.weather-section__summary-text {
+	display: grid;
+	gap: 0.4rem;
 }
 
 .weather-section__temperature {
-  display: flex;
-  align-items: baseline;
-  gap: 0.8rem;
-  flex-wrap: wrap;
+	display: flex;
+	align-items: baseline;
+	gap: 1rem;
+	flex-wrap: wrap;
+	margin: 0;
 }
 
 .weather-section__temp-primary,
-.weather-section__temp-secondary {
-  margin: 0;
+.weather-section__temp-secondary,
+.weather-section__condition,
+.weather-section__meta,
+.weather-section__updated {
+	margin: 0;
 }
 
 .weather-section__temp-primary {
-  font-size: calc(var(--font-heading-scale) * 3.2rem);
-  line-height: 1;
+	font-size: 6.4rem;
+	font-weight: 300;
+	line-height: 1;
+	letter-spacing: -0.02em;
 }
 
 .weather-section__temp-secondary {
-  color: rgba(var(--color-foreground), 0.75);
+	font-size: 1.6rem;
+	opacity: 0.75;
+}
+
+.weather-section__condition {
+	font-size: 1.8rem;
+	font-weight: 500;
+	letter-spacing: 0.02em;
 }
 
 .weather-section__meta {
-  color: rgba(var(--color-foreground), 0.85);
+	font-size: 1.4rem;
+	opacity: 0.85;
 }
 
 .weather-section__updated {
-  font-size: 1.2rem;
-  color: rgba(var(--color-foreground), 0.65);
+	font-size: 1.2rem;
+	opacity: 0.65;
 }
 
+/* -------------------------------------------------------------------------
+   Atmosphere stage (shared)
+   ------------------------------------------------------------------------- */
+
+.weather-section__stage {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	pointer-events: none;
+	overflow: hidden;
+}
+
+.weather-section__layer {
+	position: absolute;
+	inset: 0;
+	display: block;
+	opacity: 0;
+	transition: opacity 500ms ease;
+}
+
+.weather-section[data-weather]:not([data-weather='loading']) .weather-section__layer {
+	opacity: 1;
+}
+
+/* Subtle readability veil over every mood */
+.weather-section::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	z-index: 2;
+	background: linear-gradient(180deg, rgba(15, 23, 42, 0) 45%, rgba(15, 23, 42, 0.35) 100%);
+	pointer-events: none;
+}
+
+/* =========================================================================
+   SUNNY
+   ========================================================================= */
+.weather-section[data-weather='sunny'] {
+	background: linear-gradient(160deg, #ffb347 0%, #ff8a3d 45%, #f26d3d 100%);
+	color: #2a1605;
+}
+
+.weather-section[data-weather='sunny'] .weather-section__title,
+.weather-section[data-weather='sunny'] .weather-section__location,
+.weather-section[data-weather='sunny'] .weather-section__meta,
+.weather-section[data-weather='sunny'] .weather-section__updated,
+.weather-section[data-weather='sunny'] .weather-section__temp-secondary {
+	color: rgba(42, 22, 5, 0.8);
+}
+
+.weather-section[data-weather='sunny'] .weather-section__layer--one {
+	background: radial-gradient(circle at 85% 20%, rgba(255, 241, 173, 0.95) 0%, rgba(255, 241, 173, 0) 35%);
+}
+
+.weather-section[data-weather='sunny'] .weather-section__layer--two {
+	background:
+		radial-gradient(circle at 85% 20%, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 8%),
+		radial-gradient(circle at 85% 20%, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 18%);
+}
+
+.weather-section[data-weather='sunny'] .weather-section__layer--three {
+	background:
+		conic-gradient(
+			from 0deg at 85% 20%,
+			rgba(255, 255, 255, 0.25) 0deg,
+			rgba(255, 255, 255, 0) 15deg,
+			rgba(255, 255, 255, 0.25) 30deg,
+			rgba(255, 255, 255, 0) 45deg,
+			rgba(255, 255, 255, 0.25) 60deg,
+			rgba(255, 255, 255, 0) 75deg,
+			rgba(255, 255, 255, 0.25) 90deg,
+			rgba(255, 255, 255, 0) 105deg,
+			rgba(255, 255, 255, 0.25) 120deg,
+			rgba(255, 255, 255, 0) 135deg,
+			rgba(255, 255, 255, 0.25) 150deg,
+			rgba(255, 255, 255, 0) 165deg,
+			rgba(255, 255, 255, 0.25) 180deg,
+			rgba(255, 255, 255, 0) 195deg
+		);
+	mix-blend-mode: screen;
+	opacity: 0.35;
+}
+
+/* =========================================================================
+   CLOUDY
+   ========================================================================= */
+.weather-section[data-weather='cloudy'] {
+	background: linear-gradient(170deg, #8aa0b5 0%, #627489 55%, #465367 100%);
+}
+
+.weather-section[data-weather='cloudy'] .weather-section__layer--one {
+	background:
+		radial-gradient(ellipse 42% 24% at 20% 35%, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 70%),
+		radial-gradient(ellipse 36% 20% at 75% 28%, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0) 70%);
+}
+
+.weather-section[data-weather='cloudy'] .weather-section__layer--two {
+	background:
+		radial-gradient(ellipse 55% 28% at 50% 70%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 70%),
+		radial-gradient(ellipse 30% 18% at 10% 80%, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 70%);
+}
+
+/* =========================================================================
+   RAIN
+   ========================================================================= */
+.weather-section[data-weather='rain'] {
+	background: linear-gradient(170deg, #3a5368 0%, #27394b 60%, #1a2734 100%);
+}
+
+.weather-section[data-weather='rain'] .weather-section__layer--one {
+	background:
+		radial-gradient(ellipse 60% 30% at 30% 15%, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 70%),
+		radial-gradient(ellipse 50% 26% at 80% 18%, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 70%);
+}
+
+.weather-section[data-weather='rain'] .weather-section__layer--two,
+.weather-section[data-weather='rain'] .weather-section__layer--three {
+	background-image:
+		linear-gradient(
+			115deg,
+			rgba(255, 255, 255, 0) 0%,
+			rgba(255, 255, 255, 0) 46%,
+			rgba(220, 235, 255, 0.55) 48%,
+			rgba(220, 235, 255, 0.55) 50%,
+			rgba(255, 255, 255, 0) 52%,
+			rgba(255, 255, 255, 0) 100%
+		);
+	background-size: 2px 100px;
+	background-repeat: repeat;
+	opacity: 0.55;
+}
+
+.weather-section[data-weather='rain'] .weather-section__layer--three {
+	background-size: 2px 70px;
+	opacity: 0.35;
+}
+
+/* =========================================================================
+   STORM
+   ========================================================================= */
+.weather-section[data-weather='storm'] {
+	background: linear-gradient(170deg, #2a3547 0%, #1b2435 60%, #0f1623 100%);
+}
+
+.weather-section[data-weather='storm'] .weather-section__layer--one {
+	background:
+		radial-gradient(ellipse 70% 30% at 40% 18%, rgba(92, 110, 140, 0.7) 0%, rgba(92, 110, 140, 0) 70%),
+		radial-gradient(ellipse 50% 24% at 85% 22%, rgba(70, 86, 114, 0.6) 0%, rgba(70, 86, 114, 0) 70%);
+}
+
+.weather-section[data-weather='storm'] .weather-section__layer--two {
+	background-image:
+		linear-gradient(
+			115deg,
+			rgba(255, 255, 255, 0) 46%,
+			rgba(220, 235, 255, 0.55) 48%,
+			rgba(220, 235, 255, 0.55) 50%,
+			rgba(255, 255, 255, 0) 52%
+		);
+	background-size: 2px 90px;
+	background-repeat: repeat;
+	opacity: 0.55;
+}
+
+.weather-section[data-weather='storm'] .weather-section__layer--three {
+	background: rgba(255, 251, 200, 0.9);
+	mix-blend-mode: screen;
+	opacity: 0;
+}
+
+/* =========================================================================
+   SNOW
+   ========================================================================= */
+.weather-section[data-weather='snow'] {
+	background: linear-gradient(170deg, #d7e3ef 0%, #9fb4c9 60%, #6a8098 100%);
+	color: #162033;
+}
+
+.weather-section[data-weather='snow'] .weather-section__title,
+.weather-section[data-weather='snow'] .weather-section__location,
+.weather-section[data-weather='snow'] .weather-section__meta,
+.weather-section[data-weather='snow'] .weather-section__updated,
+.weather-section[data-weather='snow'] .weather-section__temp-secondary {
+	color: rgba(22, 32, 51, 0.75);
+}
+
+.weather-section[data-weather='snow']::after {
+	background: linear-gradient(180deg, rgba(255, 255, 255, 0) 55%, rgba(15, 23, 42, 0.1) 100%);
+}
+
+.weather-section[data-weather='snow'] .weather-section__layer--one {
+	background:
+		radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.9) 1px, transparent 2px),
+		radial-gradient(circle at 45% 60%, rgba(255, 255, 255, 0.9) 1.5px, transparent 2.5px),
+		radial-gradient(circle at 80% 30%, rgba(255, 255, 255, 0.9) 1px, transparent 2px),
+		radial-gradient(circle at 25% 80%, rgba(255, 255, 255, 0.9) 1.5px, transparent 2.5px),
+		radial-gradient(circle at 70% 90%, rgba(255, 255, 255, 0.9) 1px, transparent 2px);
+	background-size: 200px 200px;
+	background-repeat: repeat;
+}
+
+.weather-section[data-weather='snow'] .weather-section__layer--two {
+	background:
+		radial-gradient(circle at 30% 10%, rgba(255, 255, 255, 0.8) 2px, transparent 3px),
+		radial-gradient(circle at 60% 45%, rgba(255, 255, 255, 0.8) 1.5px, transparent 2.5px),
+		radial-gradient(circle at 90% 75%, rgba(255, 255, 255, 0.8) 2px, transparent 3px),
+		radial-gradient(circle at 10% 55%, rgba(255, 255, 255, 0.8) 1.5px, transparent 2.5px);
+	background-size: 260px 260px;
+	background-repeat: repeat;
+}
+
+/* =========================================================================
+   MIST / FOG
+   ========================================================================= */
+.weather-section[data-weather='mist'] {
+	background: linear-gradient(170deg, #c9d3db 0%, #9fabb7 60%, #6f7d8b 100%);
+	color: #1b222c;
+}
+
+.weather-section[data-weather='mist'] .weather-section__title,
+.weather-section[data-weather='mist'] .weather-section__location,
+.weather-section[data-weather='mist'] .weather-section__meta,
+.weather-section[data-weather='mist'] .weather-section__updated,
+.weather-section[data-weather='mist'] .weather-section__temp-secondary {
+	color: rgba(27, 34, 44, 0.75);
+}
+
+.weather-section[data-weather='mist'] .weather-section__layer--one {
+	background:
+		linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.45) 50%, rgba(255, 255, 255, 0) 100%);
+}
+
+.weather-section[data-weather='mist'] .weather-section__layer--two {
+	background:
+		linear-gradient(180deg, rgba(255, 255, 255, 0) 20%, rgba(255, 255, 255, 0.3) 65%, rgba(255, 255, 255, 0) 100%);
+}
+
+/* =========================================================================
+   NIGHT (clear night)
+   ========================================================================= */
+.weather-section[data-weather='night'] {
+	background: linear-gradient(170deg, #1b2340 0%, #121834 55%, #080b1a 100%);
+}
+
+.weather-section[data-weather='night'] .weather-section__layer--one {
+	background:
+		radial-gradient(circle at 78% 22%, rgba(230, 235, 255, 0.95) 0%, rgba(230, 235, 255, 0) 5%),
+		radial-gradient(circle at 78% 22%, rgba(180, 200, 255, 0.25) 0%, rgba(180, 200, 255, 0) 12%);
+}
+
+.weather-section[data-weather='night'] .weather-section__layer--two {
+	background:
+		radial-gradient(circle at 12% 20%, rgba(255, 255, 255, 0.85) 1px, transparent 2px),
+		radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.6) 1px, transparent 2px),
+		radial-gradient(circle at 55% 15%, rgba(255, 255, 255, 0.8) 1px, transparent 2px),
+		radial-gradient(circle at 68% 55%, rgba(255, 255, 255, 0.5) 1px, transparent 2px),
+		radial-gradient(circle at 88% 80%, rgba(255, 255, 255, 0.7) 1px, transparent 2px),
+		radial-gradient(circle at 22% 75%, rgba(255, 255, 255, 0.55) 1px, transparent 2px);
+	background-size: 100% 100%;
+}
+
+/* =========================================================================
+   Responsive
+   ========================================================================= */
 @media screen and (max-width: 749px) {
-  .weather-section {
-    padding: 2.4rem;
-  }
+	.weather-section {
+		padding: 2.4rem;
+		border-radius: 1.6rem;
+	}
 
-  .weather-section__summary {
-    align-items: flex-start;
-  }
+	.weather-section__summary {
+		align-items: flex-start;
+		gap: 1.4rem;
+	}
 
-  .weather-section__temp-primary {
-    font-size: calc(var(--font-heading-scale) * 2.8rem);
-  }
+	.weather-section__icon {
+		width: 6.4rem;
+		height: 6.4rem;
+	}
+
+	.weather-section__temp-primary {
+		font-size: 4.8rem;
+	}
 }

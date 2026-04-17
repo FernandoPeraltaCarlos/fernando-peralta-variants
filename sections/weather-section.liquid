@@ -15,19 +15,25 @@
 {%- endstyle -%}
 
 <div class="page-width">
-  <div class="weather-section color-{{ section.settings.color_scheme }} gradient section-{{ section.id }}-padding">
+  <div
+    class="weather-section section-{{ section.id }}-padding"
+    data-weather-widget
+    data-weather="loading"
+    data-city="{{ section.settings.city | escape }}"
+    data-weather-endpoint="https://shopify-app-wheather.vercel.app/api/weather"
+    data-use-visitor-location="{{ section.settings.use_visitor_location }}"
+  >
+    <div class="weather-section__stage" aria-hidden="true">
+      <span class="weather-section__layer weather-section__layer--one"></span>
+      <span class="weather-section__layer weather-section__layer--two"></span>
+      <span class="weather-section__layer weather-section__layer--three"></span>
+    </div>
+
     {%- if section.settings.title != blank -%}
       <h2 class="weather-section__title">{{ section.settings.title | escape }}</h2>
     {%- endif -%}
 
-    <div
-      class="weather-section__widget"
-      data-city="{{ section.settings.city | escape }}"
-      data-weather-endpoint="https://shopify-app-wheather.vercel.app/api/weather"
-      data-use-visitor-location="{{ section.settings.use_visitor_location }}"
-      data-weather-widget
-      aria-live="polite"
-    >
+    <div class="weather-section__widget" aria-live="polite">
       Loading weather...
     </div>
   </div>
@@ -63,34 +69,6 @@
       "label": "City",
       "info": "Used when visitor location is disabled or unavailable.",
       "default": "Denver"
-    },
-    {
-      "type": "select",
-      "id": "color_scheme",
-      "options": [
-        {
-          "value": "accent-1",
-          "label": "Accent 1"
-        },
-        {
-          "value": "accent-2",
-          "label": "Accent 2"
-        },
-        {
-          "value": "background-1",
-          "label": "Background 1"
-        },
-        {
-          "value": "background-2",
-          "label": "Background 2"
-        },
-        {
-          "value": "inverse",
-          "label": "Inverse"
-        }
-      ],
-      "default": "background-1",
-      "label": "Color scheme"
     },
     {
       "type": "header",

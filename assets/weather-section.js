@@ -12,14 +12,20 @@ function createElement(tagName, className, text) {
   return element;
 }
 
-function renderMessage(widget, message, state) {
-  widget.classList.remove('weather-section__widget--loading', 'weather-section__widget--error');
+function getContent(root) {
+  return root.querySelector('.weather-section__widget') || root;
+}
+
+function renderMessage(root, message, state) {
+  const content = getContent(root);
+  content.classList.remove('weather-section__widget--loading', 'weather-section__widget--error');
 
   if (state) {
-    widget.classList.add(`weather-section__widget--${state}`);
+    content.classList.add(`weather-section__widget--${state}`);
+    root.dataset.weather = state;
   }
 
-  widget.textContent = message;
+  content.textContent = message;
 }
 
 function getCurrentPosition() {
@@ -37,10 +43,10 @@ function getCurrentPosition() {
   });
 }
 
-async function resolveLocationQuery(widget) {
-  const configuredCity = widget.dataset.city?.trim();
+async function resolveLocationQuery(root) {
+  const configuredCity = root.dataset.city?.trim();
   const fallbackCity = configuredCity || 'Denver';
-  const useVisitorLocation = widget.dataset.useVisitorLocation === 'true';
+  const useVisitorLocation = root.dataset.useVisitorLocation === 'true';
 
   if (!useVisitorLocation) {
     return fallbackCity;
@@ -61,9 +67,26 @@ async function resolveLocationQuery(widget) {
   return fallbackCity;
 }
 
-function renderWeather(widget, data) {
+function resolveWeatherMood(condition, isDay) {
+  const text = (condition || '').toLowerCase();
+
+  if (text.includes('thunder') || text.includes('storm')) return 'storm';
+  if (text.includes('snow') || text.includes('blizzard') || text.includes('sleet') || text.includes('ice')) return 'snow';
+  if (text.includes('drizzle') || text.includes('rain') || text.includes('shower')) return 'rain';
+  if (text.includes('fog') || text.includes('mist') || text.includes('haze') || text.includes('smoke')) return 'mist';
+  if (text.includes('overcast') || text.includes('cloud')) return 'cloudy';
+  if (text.includes('clear') || text.includes('sun')) return isDay ? 'sunny' : 'night';
+
+  return isDay ? 'sunny' : 'night';
+}
+
+function renderWeather(root, data) {
+  const widget = getContent(root);
   widget.classList.remove('weather-section__widget--loading', 'weather-section__widget--error');
   widget.replaceChildren();
+
+  const isDay = data.is_day === undefined ? true : Boolean(data.is_day);
+  root.dataset.weather = resolveWeatherMood(data.condition, isDay);
 
   const content = createElement('div', 'weather-section__content');
   const locationParts = [data.city, data.region, data.country].filter(Boolean);
